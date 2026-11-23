@@ -1,114 +1,159 @@
-# ColorPresetsGlobal — presets de color globales para grandMA2
+# grandMA2 Global Color Presets
 
-Plugin de grandMA2 que crea presets de color **globales** en el Color Preset Pool
-a partir de una tabla de valores definida dentro del script.
+Plugin en Lua para consolas **grandMA2** que crea de un solo golpe una paleta
+completa de presets de color **globales** en el Color Preset Pool.
 
-Global = el preset no queda atado a un fixture type. Un solo preset "Red" sirve
-para todos los modelos del rig, así que no hace falta una macro por modelo.
+## Por qué lo hice
 
-**Alcance de esta etapa: solo presets.** No genera macros, ni appearances, no
-toca el Layout View, no lee el patch.
+Trabajo como ingeniero de iluminación en conciertos y festivales. En cada show
+se repite lo mismo: llega un rig nuevo, con mezcla de fixtures de distintas
+marcas, y antes de empezar a programar hay que armar la paleta de colores base.
+Hacerlo a mano, color por color y tipo de fixture por tipo de fixture, se come
+un tiempo que en un montaje nunca sobra.
+
+Este plugin resuelve esa parte: seleccionas el rig, lo ejecutas y en segundos
+tienes los presets listos, con nombre, en los slots que definiste y válidos
+para cualquier fixture del show.
+
+Lo he puesto en práctica en producción real, en shows como:
+
+- **Maluma — Medallo en el Mapa 2.0** (Medellín)
+- **J Balvin — Ciudad Primavera**
+- **Festival Cordillera**
+
+Detrás de esto está la forma en la que me gusta trabajar: iluminación y DMX
+combinados con programación e inteligencia artificial. Uso IA como herramienta
+de desarrollo para escribir y revisar código y para automatizar tareas
+repetitivas de la consola, pero todo se prueba primero en grandMA2 onPC y
+después en consola antes de llegar a un show.
 
 ---
 
-## Archivos
+## Qué hace
+
+1. Verifica que haya fixtures seleccionados (si no, avisa y no toca nada).
+2. Muestra un resumen: cantidad de colores, pool, rango de slots y modo.
+3. Para cada color de la tabla, aplica los valores RGB al programador y lo
+   guarda como preset **global** con su nombre (`Label`).
+4. Termina con `ClearAll` para dejar el programador limpio.
+
+Paleta incluida por defecto (pool 4 = Color):
+
+| Slot | Nombre | R | G | B |
+|---|---|---|---|---|
+| 4.1 | White | 100 | 100 | 100 |
+| 4.2 | Red | 100 | 0 | 0 |
+| 4.3 | Orange | 100 | 45 | 0 |
+| 4.4 | Yellow | 100 | 100 | 0 |
+| 4.5 | Fern Green | 40 | 100 | 20 |
+| 4.6 | Green | 0 | 100 | 0 |
+| 4.8 | Cyan | 0 | 100 | 100 |
+| 4.10 | Blue | 0 | 0 | 100 |
+| 4.11 | Violet | 50 | 0 | 100 |
+| 4.12 | Magenta | 100 | 0 | 100 |
+
+Los valores van en porcentaje (0–100), igual que en el command line de MA2. Son
+un punto de partida: cada rig responde distinto, sobre todo en ámbar/naranja y
+verdes, y lo normal es ajustarlos en sitio.
+
+### Global vs. selective
+
+En grandMA2 un preset puede guardarse como **selective** (atado a los fixtures
+que estaban seleccionados), **global** (atado al tipo de fixture) o
+**universal**. El plugin usa `/global`, así que un solo preset "Red" funciona
+para todos los modelos del rig que tengan los atributos de color RGB, sin
+necesidad de una macro por modelo.
+
+Los atributos que escribe son los de mezcla RGB de la librería de MA2:
+`ColorRGB1` (R), `ColorRGB2` (G) y `ColorRGB3` (B). La consola se encarga de
+traducir esos valores a los canales DMX reales de cada fixture según su perfil
+(RGB, RGBW, CMY, etc.).
+
+---
+
+## Especificaciones
+
+### Software
+
+| | |
+|---|---|
+| Plataforma | grandMA2 (consola y grandMA2 onPC) |
+| Versión probada | **grandMA2 onPC 3.9.63.6** |
+| Esquema del XML de import | `3.9.63/MA.xsd` (`major_vers="3" minor_vers="9" stream_vers="63"`) |
+| Lenguaje | Lua (motor de plugins de grandMA2) |
+| API `gma` usada | `gma.cmd`, `gma.echo`, `gma.feedback`, `gma.gui.confirm`, `gma.show.getvar` |
+
+### Consola de referencia: grandMA2 full-size
+
+| | |
+|---|---|
+| Parámetros | 8.192 HTP/LTP en consola; hasta 65.536 (256 universos DMX) con MA NPU |
+| DMX | 6 salidas DMX (XLR 5 pines) + 1 entrada DMX |
+| Pantallas | 3 touchscreens internas de 15,4" + 1 pantalla de comandos multitáctil de 9" + 2 salidas para monitores externos |
+| Faders | 30 executors motorizados + 2 faders A/B motorizados de 100 mm |
+| Red | MA-Net2 / Art-Net / sACN para distribuir DMX por Ethernet |
+
+El plugin no depende del modelo de consola: corre igual en full-size, light,
+ultra-light y onPC con la misma versión de software.
+
+---
+
+## Instalación
+
+Archivos:
 
 | Archivo | Qué es |
 |---|---|
 | `ColorPresetsGlobal.lua` | El plugin |
-| `ColorPresetsGlobal.xml` | Wrapper de import (apunta al `.lua`) |
+| `ColorPresetsGlobal.xml` | Archivo de import que apunta al `.lua` |
 
-Los dos tienen que viajar **juntos y en la misma carpeta**, con el mismo nombre
-base. Si renombrás uno tenés que renombrar el otro y además actualizar el
-atributo `luafile=` dentro del `.xml`.
+Los dos van juntos, en la misma carpeta y con el mismo nombre base. Si
+renombras uno, renombra el otro y actualiza `luafile=` dentro del `.xml`.
 
-Versión de consola de destino: **grandMA2 3.9.63** (el XML declara
-`3.9.63/MA.xsd`, `major_vers="3" minor_vers="9" stream_vers="63"`).
-Si importás en una consola con otra build, cambiá esos tres valores por los que
-escriba esa consola al exportar cualquier objeto (mirá el header de un XML suyo).
-
----
-
-## Instalar
-
-1. Copiá `ColorPresetsGlobal.lua` y `ColorPresetsGlobal.xml` a la carpeta
-   `gma2/plugins/` de la USB o del disco de la consola.
-
-   En onPC (Windows) esa carpeta es:
+1. Copia los dos archivos a `gma2/plugins/` en la USB o en el disco de la
+   consola. En onPC (Windows):
    ```
    C:\ProgramData\MA Lighting Technologies\grandma\gma2_V_3.9.63\plugins\
    ```
+2. Abre el **Plugin Pool**.
+3. Slot vacío → **Import** → `ColorPresetsGlobal`.
 
-2. En la consola, abrí el **Plugin Pool**.
-3. Tocá un slot vacío → **Import** → elegí `ColorPresetsGlobal`.
-4. El plugin queda en ese slot listo para ejecutar.
+Si la consola tiene otra versión de software, cambia en el `.xml` los valores
+`major_vers`, `minor_vers` y `stream_vers` por los de esa consola (los puedes
+ver en la cabecera de cualquier XML que exporte).
 
-## Usar
+## Uso
 
-1. **Seleccioná los fixtures** que querés usar como base del preset (puede ser
-   una selección mixta de tipos: eso es justamente el punto de un preset global).
-2. Ejecutá el plugin desde el Plugin Pool.
-3. Aparece un diálogo con la cantidad de colores, el pool y el rango de slots.
-   Confirmá o cancelá.
-4. Al terminar muestra un resumen y **deja el programador limpio** (`ClearAll`).
+1. Selecciona los fixtures que quieres usar como base (puede ser una selección
+   mixta de tipos; para eso es el preset global).
+2. Ejecuta el plugin desde el Plugin Pool.
+3. Confirma en el diálogo.
+4. Al terminar muestra un resumen con los comandos ejecutados y los errores, si
+   hubo alguno.
 
-Si corrés el plugin sin selección activa, avisa con un diálogo y sale sin tocar
-nada.
+## Configuración
 
----
-
-## Editar la tabla de colores
-
-Todo lo editable está al principio del `.lua`, en el bloque marcado
-`USER CONFIG`.
-
-```lua
-local COLORS = {
-  { num =  1, name = "White",      r = 100, g = 100, b = 100 },
-  { num =  2, name = "Red",        r = 100, g =   0, b =   0 },
-  ...
-}
-```
-
-- `num` — número de color según la numeración del show. **No es el slot final**,
-  ver `START_SLOT`.
-- `name` — el nombre que se le pone al preset (`Label`).
-- `r`, `g`, `b` — 0..100 (porcentaje, igual que el command line de MA2).
-
-Los RGB que vienen son una **propuesta de arranque**. Ajustalos a mano después de
-ver cómo responden los fixtures reales; es normal que "Orange" o "Fern Green"
-necesiten retoque por rig.
-
-Para agregar un color: agregá una línea más a la tabla. Para sacar uno: borrá o
-comentá la línea con `--` al principio.
-
-### Otros parámetros
+Todo lo editable está al principio del `.lua`, en el bloque `USER CONFIG`.
 
 | Parámetro | Default | Qué hace |
 |---|---|---|
+| `COLORS` | 10 colores | Tabla `num`, `name`, `r`, `g`, `b`. Agrega o comenta líneas para cambiar la paleta. |
 | `PRESET_POOL` | `4` | Pool de destino. 0=All 1=Dimmer 2=Position 3=Gobo **4=Color** 5=Beam 6=Focus 7=Control 8=Shapers 9=Video |
-| `START_SLOT` | `1` | Slot del primer color. El slot de cada color es `START_SLOT - 1 + num`. Con `1`, los slots coinciden exactamente con la columna `num` (1,2,3,4,5,6,8,10,11,12). Con `101`, White va a `4.101`. |
-| `OVERWRITE` | `true` | `true` sobrescribe slots ocupados sin preguntar. `false` deja que la consola abra su popup de Store en cada slot ocupado y decidís ahí (ver limitación abajo). |
-| `DRY_RUN` | `false` | `true` no ejecuta nada: solo imprime los comandos en el Command Line Feedback. |
+| `START_SLOT` | `1` | Slot del primer color: `slot = START_SLOT - 1 + num`. Con `101`, White queda en `4.101`. |
+| `OVERWRITE` | `true` | `true` sobrescribe sin preguntar. `false` deja que la consola abra su popup de Store en cada slot ocupado. |
+| `DRY_RUN` | `false` | `true` no ejecuta nada, solo imprime los comandos en el Command Line Feedback. |
 
-El plugin **solo escribe en el pool y el rango configurados**. No toca ningún
-otro pool.
+El plugin solo escribe en el pool y el rango configurados.
 
 ---
 
 ## Probar por telnet (puerto 30000)
 
-El script está partido en dos funciones a propósito:
+El código separa la generación de comandos (`build_commands()`) de la ejecución
+(`run_commands()`). Con `DRY_RUN = true` los comandos salen numerados en el
+feedback y se pueden pegar tal cual en una sesión telnet a la consola.
 
-- `build_commands()` — devuelve la lista completa de comandos, en orden, **sin
-  ejecutar nada**. Cada string es una línea válida del command line de MA2.
-- `run_commands(cmds)` — ejecuta esa lista.
-
-Para ver los comandos sin escribir en el show, poné `DRY_RUN = true` y ejecutá:
-los comandos salen numerados en el Command Line Feedback y se pueden copiar tal
-cual a una sesión telnet.
-
-Con la tabla que viene por defecto, la secuencia por color es:
+Secuencia por color:
 
 ```
 Attribute "ColorRGB1" At 100
@@ -118,68 +163,31 @@ Store Preset 4.2 /global /overwrite /noconfirm
 Label Preset 4.2 "Red"
 ```
 
-y al final, una sola vez:
+y al final `ClearAll`.
+
+## Deshacer
 
 ```
-ClearAll
+Delete Preset 4.1 Thru 4.12
 ```
 
-Para probar un color suelto por telnet, seleccioná fixtures primero
-(`Fixture 1 Thru 10`) y después pegá los 5 comandos de arriba.
-
-### Por qué `/global`
-
-Del manual de la consola (keyword `Store`, tabla de opciones):
-
-| Opción | Corto | Descripción |
-|---|---|---|
-| `global` | `g` | Stores preset with global values |
-| `selective` | `s` | Stores preset with selective values |
-| `universal` | `u` | Stores preset with universal values |
-| `overwrite` | `o` | Removes stored values and stores the new ones |
-| `noconfirm` | `nc` | Suppress store confirmation pop-up |
-
-`/global` es el switch que hace que el preset valga para cualquier fixture type
-en vez de quedar ligado a los fixtures que estaban seleccionados al guardarlo.
+(ajusta el rango si cambiaste `PRESET_POOL` o `START_SLOT`). Borrar el plugin
+del Plugin Pool no borra los presets que creó, y viceversa.
 
 ---
 
-## Desinstalar
+## Próximamente: grandMA3
 
-1. **Borrar los presets creados** (si querés deshacer el resultado):
-   ```
-   Delete Preset 4.1 Thru 4.12
-   ```
-   Ajustá el rango si cambiaste `PRESET_POOL` o `START_SLOT`. Ese es exactamente
-   el rango que muestra el diálogo de confirmación al ejecutar.
+La siguiente versión será para **grandMA3** (software 2.x). MA3 cambia bastante
+la forma de trabajar —nueva API de plugins, nuevo sistema de presets y
+recipes, fixtures con color por gel/espectro— así que no es una traducción
+directa sino un port pensado para MA3.
 
-2. **Sacar el plugin del show**: en el Plugin Pool, `Delete` sobre el slot del
-   plugin.
+Pendientes:
 
-3. **Borrar los archivos**: eliminá `ColorPresetsGlobal.lua` y
-   `ColorPresetsGlobal.xml` de `gma2/plugins/`.
-
-Borrar el plugin **no** borra los presets que ya creó, y borrar los presets no
-borra el plugin: son dos pasos independientes.
-
----
-
-## Limitación conocida de esta etapa
-
-`OVERWRITE = false` no puede abortar solo. Para saber si un slot ya está ocupado
-haría falta `gma.show.getobj.handle("Preset 4.1")`, y esta etapa tiene prohibido
-usar `gma.show.getobj`. Lo que hace hoy con `OVERWRITE = false` es no mandar
-`/overwrite` ni `/noconfirm`: la consola abre su propio popup de Store en cada
-slot ocupado y el operador decide (Overwrite / Merge / Cancel). La detección
-automática queda para una etapa posterior. Está marcado como `TODO` al final del
-`.lua`.
-
-## API `gma` usada
-
-Solo funciones que existen en la referencia de la consola:
-
-- `gma.cmd(string)` → `string:error`
-- `gma.echo(...)`
-- `gma.feedback(...)`
-- `gma.gui.confirm(title, message)` → `bool` (el `|` separa líneas en el mensaje)
-- `gma.show.getvar("SELECTEDFIXTURESCOUNT")` → `string` (para el chequeo de selección)
+- [ ] Port a la API de plugins de grandMA3.
+- [ ] Detectar slots ocupados antes de escribir, en vez de depender del popup
+      de Store cuando `OVERWRITE = false`.
+- [ ] Generar también appearances (color del botón del preset) y macros.
+- [ ] Leer la paleta desde un archivo externo para no tener que editar el
+      `.lua` en cada show.

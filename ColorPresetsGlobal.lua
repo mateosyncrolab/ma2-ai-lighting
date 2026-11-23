@@ -1,14 +1,14 @@
 -- ColorPresetsGlobal.lua
--- grandMA2 plugin - Etapa 1: presets de color GLOBALES
+-- grandMA2 plugin: presets de color globales
 --
 -- Crea presets de color en el Color Preset Pool a partir de la tabla COLORS.
 -- Los presets se guardan con la opcion /global, asi que un mismo preset sirve
 -- para cualquier tipo de fixture (no queda atado al fixture type).
 --
--- Alcance: SOLO presets. No genera macros, ni appearances, ni toca el Layout
--- View, ni lee el patch.
+-- Solo crea presets: no genera macros ni appearances, no toca el Layout View
+-- y no lee el patch.
 --
--- API gma usada (toda verificada contra la referencia de la consola):
+-- API gma usada:
 --   gma.cmd(string) -> string:error
 --   gma.echo(...)
 --   gma.feedback(...)
@@ -26,7 +26,7 @@
 --   name  = nombre que se le pone al preset
 --   r/g/b = valores 0..100 (porcentaje, igual que el command line de MA2)
 --
--- Estos RGB son una PROPUESTA DE ARRANQUE. Ajustalos a mano despues de ver
+-- Estos RGB son una PROPUESTA DE ARRANQUE. Ajustarlos despues de ver
 -- como responden los fixtures reales.
 local COLORS = {
   { num =  1, name = "White",      r = 100, g = 100, b = 100 },
@@ -48,13 +48,13 @@ local PRESET_POOL = 4
 -- Primer slot a escribir. El slot de cada color se calcula como:
 --     slot = START_SLOT - 1 + color.num
 -- Con START_SLOT = 1 los slots coinciden exactamente con la columna "num"
--- de la tabla (1,2,3,4,5,6,8,10,11,12). Subilo para desplazar todo el bloque
+-- de la tabla (1,2,3,4,5,6,8,10,11,12). Subirlo para desplazar todo el bloque
 -- (p. ej. START_SLOT = 101 -> White va a 4.101).
 local START_SLOT = 1
 
 -- true  -> sobrescribe slots ocupados sin preguntar (Store ... /overwrite /noconfirm)
 -- false -> no sobrescribe en silencio: si el slot esta ocupado la consola abre
---          su popup de Store y vos decidis (Overwrite / Merge / Cancel).
+--          su popup de Store y el operador decide (Overwrite / Merge / Cancel).
 --          Ver la nota TODO al final del archivo.
 local OVERWRITE = true
 
@@ -173,7 +173,7 @@ local function main()
   if sel < 1 then
     gma.gui.confirm(PLUGIN_NAME,
       "No hay fixtures seleccionados.|" ..
-      "Selecciona los fixtures y volve a correr el plugin.")
+      "Selecciona los fixtures y vuelve a correr el plugin.")
     gma.echo(PLUGIN_NAME .. ": abortado, no hay seleccion activa.")
     return
   end
@@ -228,13 +228,12 @@ local function main()
 end
 
 
--- TODO / limitaciones conocidas de esta etapa
+-- TODO
 --
--- 1. OVERWRITE = false no puede "abortar" por si solo: para saber si un slot ya
---    esta ocupado hace falta gma.show.getobj.handle("Preset 4.1"), y esta etapa
---    tiene prohibido usar gma.show.getobj. Lo que hace hoy es NO mandar
---    /noconfirm ni /overwrite, con lo cual la consola abre su propio popup de
---    Store en cada slot ocupado y el operador decide (Overwrite / Merge /
---    Cancel). La deteccion automatica queda para una etapa posterior.
+-- OVERWRITE = false no aborta por si solo: para saber si un slot ya esta
+-- ocupado habria que usar gma.show.getobj.handle("Preset 4.1"), que todavia no
+-- esta implementado. Por ahora no manda /noconfirm ni /overwrite, asi que la
+-- consola abre su propio popup de Store en cada slot ocupado y el operador
+-- decide (Overwrite / Merge / Cancel).
 
 return main
