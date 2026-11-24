@@ -1,6 +1,6 @@
-# grandMA2 Global Color Presets — IA + control por voz
+# MA2 AI Lighting — IA + control por voz para grandMA2
 
-[![tests](https://github.com/mateosyncrolab/grandma2-global-color-presets/actions/workflows/ci.yml/badge.svg)](https://github.com/mateosyncrolab/grandma2-global-color-presets/actions/workflows/ci.yml)
+[![tests](https://github.com/mateosyncrolab/ma2-ai-lighting/actions/workflows/ci.yml/badge.svg)](https://github.com/mateosyncrolab/ma2-ai-lighting/actions/workflows/ci.yml)
 ![grandMA2](https://img.shields.io/badge/grandMA2-3.9.63.6-orange)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Lua](https://img.shields.io/badge/lua-plugin-2C2D72)
