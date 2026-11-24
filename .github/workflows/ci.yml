@@ -1,0 +1,24 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e ".[dev]"
+      - run: python -m ma2tools validate palettes/*.json
+      - run: pytest -v
+      - name: El plugin coincide con la paleta
+        run: |
+          python -m ma2tools apply palettes/default.json
+          git diff --exit-code plugin/
