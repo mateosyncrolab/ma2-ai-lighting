@@ -1,0 +1,15 @@
+{
+  "name": "default",
+  "colors": [
+    {"num": 1,  "name": "White",      "rgb": [100, 100, 100]},
+    {"num": 2,  "name": "Red",        "rgb": [100,   0,   0]},
+    {"num": 3,  "name": "Orange",     "rgb": [100,  45,   0]},
+    {"num": 4,  "name": "Yellow",     "rgb": [100, 100,   0]},
+    {"num": 5,  "name": "Fern Green", "rgb": [ 40, 100,  20]},
+    {"num": 6,  "name": "Green",      "rgb": [  0, 100,   0]},
+    {"num": 8,  "name": "Cyan",       "rgb": [  0, 100, 100]},
+    {"num": 10, "name": "Blue",       "rgb": [  0,   0, 100]},
+    {"num": 11, "name": "Violet",     "rgb": [ 50,   0, 100]},
+    {"num": 12, "name": "Magenta",    "rgb": [100,   0, 100]}
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "whites-kelvin",
+  "colors": [
+    {"num": 21, "name": "2700K",  "kelvin": 2700},
+    {"num": 22, "name": "3200K",  "kelvin": 3200},
+    {"num": 23, "name": "4300K",  "kelvin": 4300},
+    {"num": 24, "name": "5600K",  "kelvin": 5600},
+    {"num": 25, "name": "6500K",  "kelvin": 6500}
+  ]
+}

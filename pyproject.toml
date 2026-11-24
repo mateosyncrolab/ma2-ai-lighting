@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ma2tools"
+version = "1.1.0"
+description = "Paletas de color, telnet y control por voz con IA para grandMA2"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+voice = ["vosk>=0.3.45", "sounddevice>=0.4"]
+dev = ["pytest>=8", "lupa>=2.0"]
+
+[project.scripts]
+ma2tools = "ma2tools.__main__:main"
+
+[tool.setuptools]
+packages = ["ma2tools"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
