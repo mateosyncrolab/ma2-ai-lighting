@@ -28,6 +28,7 @@
 --
 -- Estos RGB son una PROPUESTA DE ARRANQUE. Ajustarlos despues de ver
 -- como responden los fixtures reales.
+-- @palette-begin (generado con: python -m ma2tools apply)
 local COLORS = {
   { num =  1, name = "White",      r = 100, g = 100, b = 100 },
   { num =  2, name = "Red",        r = 100, g =   0, b =   0 },
@@ -40,6 +41,7 @@ local COLORS = {
   { num = 11, name = "Violet",     r =  50, g =   0, b = 100 },
   { num = 12, name = "Magenta",    r = 100, g =   0, b = 100 },
 }
+-- @palette-end
 
 -- Pool de presets de destino.
 -- 0=All 1=Dimmer 2=Position 3=Gobo 4=Color 5=Beam 6=Focus 7=Control 8=Shapers 9=Video
